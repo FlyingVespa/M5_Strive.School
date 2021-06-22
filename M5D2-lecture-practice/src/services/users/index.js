@@ -4,26 +4,16 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const usersRouter = express.Router();
-
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentFolderPath = dirname(currentFilePath);
+const usersJSONpath = join(currentFolderPath, "users.json");
 //1  READ --> GET http://localhost:3333/users
 usersRouter.get("/", (req, res) => {
   res.send("this is coming from user ");
-  const currentFilePath = fileURLToPath(import.meta.url);
-  const currentFolderPath = dirname(currentFilePath);
-  const usersJSONpath = join(currentFolderPath, "users.json");
-  const usersJSON = fs.readFileSync(usersJSONpath);
-
-  console.log(usersJSON);
-  //   console.log(usersJSON.toString());
-  res.send({
-    currentFilePath,
-    metaURL: import.meta.url,
-    currentFolderPath,
-    usersJSONpath,
-  });
-  // fs.readFileSync("users.json")
-  // read user json file
-  // send content  as a response
+ 
+  const usersJSONcontent = fs.readFileSync(usersJSONpath);
+const contentAsJSON = JSON.parse(usersJSONcontent)
+  res.send(contentAsJSON)
 });
 
 //2  READ --> GET http://localhost:3333/users/:id
