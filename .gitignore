@@ -1,6 +1,6 @@
 /node_modules
 M5D2/node_modules/
-M5D2-lecture-practice/node_modules
+M5D2-lecture-practice//node_modules
 M5D3/node_modules
 M5D4/node_modules
 M5D5/node_modules
