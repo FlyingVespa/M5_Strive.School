@@ -30,7 +30,6 @@ blogPostRouter.get("/", (req, res, next) => {
       const filteredBlogPost = posts.filter(
         (post) => post.hasOwnProperty("title") && post.title === req.query.title
       );
-
       res.send(filteredBlogPost);
     }
   } catch (error) {
@@ -48,13 +47,13 @@ blogPostsRouter.get("/:id", async (req, res, next) => {
   }
 });
 
-blogPostsRouter.post("/", postValidation, async (req, res, next) => {
+blogPostsRouter.post("/", postValidation, (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       next(createError(400, { errorList: errors }));
     } else {
-      const posts = await getPosts();
+      const posts = getPosts();
       const newPost = { _id: uniqid(), ...req.body, createdAt: new Date() };
       posts.push(newPost);
       await writePosts(posts);
