@@ -35,10 +35,10 @@ blogPostsRouter.get("/", (req, res, next) => {
 });
 
 //2 GET Single Post
-blogPostsRouter.get("/:postId", (req, res, next) => {
+blogPostsRouter.get("/:id", (req, res, next) => {
   try {
     const posts = getBlogPostArray();
-    const post = posts.find((post) => post._id === req.params.postId);
+    const post = posts.find((post) => post._id === req.params.id);
     if (post) {
       res.send(post);
     } else {
@@ -68,12 +68,10 @@ blogPostsRouter.post("/", postValidation, (req, res, next) => {
 });
 
 //4 PUT blogPost
-blogPostsRouter.put("/:postId", (req, res, next) => {
+blogPostsRouter.put("/:id", (req, res, next) => {
   try {
     const posts = getBlogPostArray();
-    const remainingPosts = posts.filter(
-      (post) => post._id !== req.params.postId
-    );
+    const remainingPosts = posts.filter((post) => post._id !== req.params.id);
     const modifiedPost = {
       ...req.body,
       id: req.params.postId,
@@ -88,12 +86,10 @@ blogPostsRouter.put("/:postId", (req, res, next) => {
 });
 
 // 5. DELETE blogPost
-blogPostsRouter.delete("/:postId", (req, res, next) => {
+blogPostsRouter.delete("/:id", (req, res, next) => {
   try {
     const posts = getBlogPostArray();
-    const remainingPosts = posts.filter(
-      (post) => post._id !== req.params.postId
-    );
+    const remainingPosts = posts.filter((post) => post._id !== req.params.id);
     writeBlogPosts(remainingPosts);
     res.status(204).send();
   } catch (error) {
