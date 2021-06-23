@@ -34,14 +34,14 @@ blogPostsRouter.get("/", (req, res, next) => {
 });
 
 //2 GET Single Post
-blogPostsRouter.get("/:id", (req, res, next) => {
+blogPostsRouter.get("/:id", postValidation, (req, res, next) => {
   try {
     const posts = getBlogPostArray();
     const post = posts.find((post) => post._id === req.params.id);
     if (post) {
       res.send(post);
     } else {
-      next(createError(404, `this is an error , your problem fix it.`));
+      next(createError(404, "this is an error , your problem fix it."));
     }
   } catch (error) {
     next(error);
@@ -49,7 +49,7 @@ blogPostsRouter.get("/:id", (req, res, next) => {
 });
 
 //3 POST blogPost
-blogPostsRouter.post("/", postValidation, (req, res, next) => {
+blogPostsRouter.post("/", (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (errors.isEmpty()) {

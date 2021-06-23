@@ -1,16 +1,1 @@
-{
-  "_id": "123456",
-  "category": "ARTICLE CATEGORY",
-  "title": "ARTICLE TITLE",
-  "cover": "ARTICLE COVER (IMAGE LINK)",
-  "readTime": {
-    "value": 2,
-    "unit": "minute"
-  },
-  "author": {
-    "name": "AUTHOR AVATAR NAME",
-    "avatar": "AUTHOR AVATAR LINK"
-  },
-  "content": "HTML",
-  "createdAt": "NEW DATE"
-}
+[{"category":"ARTICLE CATE111111GORY","title":"ARTICLE TITLE","cover":"ARTICLE COVER (IMAGE LINK)","readTime":{"value":2,"unit":"minute"},"author":{"name":"AUTHOR AVATAR NAME","avatar":"AUTHOR AVATAR LINK"},"content":"HTML","createdAt":"2021-06-23T21:03:42.652Z","_id":"8cyikhifwkq9yrt4t"}]
