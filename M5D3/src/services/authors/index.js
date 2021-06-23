@@ -1,12 +1,16 @@
 import express from "express";
 import fs from "fs";
 import uniqid from "uniqid";
-import path, { dirname } from "path";
+import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import createError from "http-errors"
-import { validationResult } from "express-validator"
-import { loggerMiddleware } from "./middlewares.js"
-import { authorValidation } from "./authorValidation"
+import createError from "http-errors";
+import { validationResult } from "express-validator";
+// import { loggerMiddleware } from "./middlewares.js";
+// import { authorValidation } from "./authorValidation";
+
+export const loggerMiddleware = (req, res, next) => {
+  console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
+};
 
 const authorsRouter = express.Router();
 const authorJSONpath = join(
@@ -77,33 +81,35 @@ authorsRouter.post("/", (req, res, next) => {
   }
 });
 
-
 //  update author
 authorsRouter.put("/:id", async (req, res, next) => {
   try {
-   const authors = getAuthorArray();
-   const remainingAuthors = authors.filter(author => author._id !== req.params.userId)
-   const updatedAuthor = {...req.body, _id: req.params.userId}
-   remainingAuthors.push(updatedAuthor)
-   writeAuthor(remainingAuthors)
-   res.send(updatedAuthor)
-  }catch(error){
-    next(error)
+    const authors = getAuthorArray();
+    const remainingAuthors = authors.filter(
+      (author) => author._id !== req.params.userId
+    );
+    const updatedAuthor = { ...req.body, _id: req.params.userId };
+    remainingAuthors.push(updatedAuthor);
+    writeAuthor(remainingAuthors);
+    res.send(updatedAuthor);
+  } catch (error) {
+    next(error);
   }
 });
 
 //5. DELETE  author
 authorsRouter.delete("/:id", async (req, res, next) => {
   try {
-const authors = getAuthorArray()
-const remainingAuthors = authors.filter(author => author._id !== req.params.authId)
+    const authors = getAuthorArray();
+    const remainingAuthors = authors.filter(
+      (author) => author._id !== req.params.authId
+    );
 
-writeAuthor(remainingAuthors)
-res.status(200).send("Deleted!")
-  
-}catch(error){
-  next(error)
-};
-
+    writeAuthor(remainingAuthors);
+    res.status(200).send("Deleted!");
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default authorsRouter;

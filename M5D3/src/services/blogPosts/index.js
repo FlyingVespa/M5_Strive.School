@@ -5,7 +5,6 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { validationResult } from "express-validator";
 import { postValidation } from "./postValidation";
-// import multer from "multer";
 
 const blogPostsRouter = express.Router();
 const blogPostsJSONpath = join(
@@ -22,7 +21,7 @@ const writeBlogPosts = (content) => {
 };
 
 //1. GET ALL blogPosts
-blogPostRouter.get("/", (req, res, next) => {
+blogPostsRouter.get("/", (req, res, next) => {
   try {
     const posts = getPosts();
 
@@ -39,7 +38,7 @@ blogPostRouter.get("/", (req, res, next) => {
 
 blogPostsRouter.get("/:id", async (req, res, next) => {
   try {
-    const posts = await getPosts();
+    const posts = getPosts();
     const post = posts.find((post) => post._id === req.params.id);
     res.send(post);
   } catch (error) {
@@ -56,7 +55,7 @@ blogPostsRouter.post("/", postValidation, (req, res, next) => {
       const posts = getPosts();
       const newPost = { _id: uniqid(), ...req.body, createdAt: new Date() };
       posts.push(newPost);
-      await writePosts(posts);
+      writePosts(posts);
 
       res.status(201).send({ id: newPost._id });
     }
@@ -66,16 +65,16 @@ blogPostsRouter.post("/", postValidation, (req, res, next) => {
 });
 
 blogPostsRouter.post(
-  "/:id/uploadCover",
-  multer({ storage: cloudinaryStorage }).single("coverPicture"),
-  async (req, res, next) => {
+  "/:id",
+
+  (req, res, next) => {
     try {
-      const posts = await getPosts();
+      const posts = getPosts();
       const post = posts.find((post) => post._id === req.params.id);
       post.cover = `${req.file.path}`;
       const remainingPosts = posts.filter((post) => post._id !== req.params.id);
       remainingPosts.push(post);
-      await writePosts(remainingPosts);
+      writePosts(remainingPosts);
       res.send(post);
     } catch (error) {
       next(error);
@@ -85,7 +84,7 @@ blogPostsRouter.post(
 
 blogPostsRouter.put("/:id", async (req, res, next) => {
   try {
-    const posts = await getPosts();
+    const posts = getPosts();
     const newPosts = posts.filter((post) => post._id !== req.params.id);
     const modifiedPost = {
       ...req.body,
@@ -94,17 +93,17 @@ blogPostsRouter.put("/:id", async (req, res, next) => {
     };
     newPosts.push(modifiedPost);
 
-    await writePosts(newPosts);
+    writePosts(newPosts);
     res.send(modifiedPost);
   } catch (error) {
     next(error);
   }
 });
-blogPostsouter.delete("/:id", async (req, res, next) => {
+blogPostsRouter.delete("/:id", async (req, res, next) => {
   try {
-    const posts = await getPosts();
+    const posts = getPosts();
     const remainingPosts = posts.filter((post) => post._id !== req.params.id);
-    await writePosts(remainingPosts);
+    writePosts(remainingPosts);
     res.status(204).send();
   } catch (error) {
     next(error);
