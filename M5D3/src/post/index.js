@@ -4,8 +4,8 @@ import uniqid from "uniqid";
 import { validationResult } from "express-validator";
 import createError from "http-errors";
 import { postValidation } from "./validator";
-// import multer from "multer";
-// import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
 // import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const postsRouter = express.Router();
