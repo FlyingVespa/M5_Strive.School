@@ -15,4 +15,11 @@ const authorValidation = [
     .withMessage("Email not valid"),
 ];
 
+// name
+// surname
+// ID (Unique and server generated)
+// email
+// date of birth
+// avatar (e.g. https://ui-avatars.com/api/?name=John+Doe)
+
 export default authorValidation;

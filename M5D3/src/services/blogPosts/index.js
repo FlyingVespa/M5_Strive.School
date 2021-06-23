@@ -1,21 +1,25 @@
 import express from "express";
 import uniqid from "uniqid";
+import fs from "fs";
 import createError from "http-errors";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { validationResult } from "express-validator";
-import { postValidation } from "./postValidation";
+
+import postValidation from "./postValidation.js";
 
 const blogPostsRouter = express.Router();
+
 const blogPostsJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
-  "blogPosts.json"
+  "../../jsondata/blogPosts.json"
 );
 
 const getBlogPostArray = () => {
   const content = fs.readFileSync(blogPostsJSONpath);
   return JSON.parse(content);
 };
+
 const writeBlogPosts = (content) => {
   fs.writeFileSync(blogPostsJSONpath, JSON.stringify(content));
 };
@@ -23,90 +27,77 @@ const writeBlogPosts = (content) => {
 //1. GET ALL blogPosts
 blogPostsRouter.get("/", (req, res, next) => {
   try {
-    const posts = getPosts();
+    const posts = getBlogPostArray();
+    res.send(posts);
+  } catch (error) {
+    next(error);
+  }
+});
 
-    if (req.query && req.query.title) {
-      const filteredBlogPost = posts.filter(
-        (post) => post.hasOwnProperty("title") && post.title === req.query.title
-      );
-      res.send(filteredBlogPost);
+//2 GET Single Post
+blogPostsRouter.get("/:postId", (req, res, next) => {
+  try {
+    const posts = getBlogPostArray();
+    const post = posts.find((post) => post._id === req.params.postId);
+    if (post) {
+      res.send(post);
+    } else {
+      next(createError(404, `this is an error , your problem fix it.`));
     }
   } catch (error) {
     next(error);
   }
 });
 
-blogPostsRouter.get("/:id", async (req, res, next) => {
-  try {
-    const posts = getPosts();
-    const post = posts.find((post) => post._id === req.params.id);
-    res.send(post);
-  } catch (error) {
-    next(error);
-  }
-});
-
+//3 POST blogPost
 blogPostsRouter.post("/", postValidation, (req, res, next) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      next(createError(400, { errorList: errors }));
-    } else {
-      const posts = getPosts();
-      const newPost = { _id: uniqid(), ...req.body, createdAt: new Date() };
+    if (errors.isEmpty()) {
+      const newPost = { ...req.body, _id: uniqid(), createdAt: new Date() };
+      const posts = getBlogPostArray();
       posts.push(newPost);
-      writePosts(posts);
-
-      res.status(201).send({ id: newPost._id });
+      writeBlogPosts(posts);
+      res.status(201).send({ _id: newPost._id });
+    } else {
+      next(createError(400, { errorsList: errors }));
     }
   } catch (error) {
     next(error);
   }
 });
 
-blogPostsRouter.post(
-  "/:id",
-
-  (req, res, next) => {
-    try {
-      const posts = getPosts();
-      const post = posts.find((post) => post._id === req.params.id);
-      post.cover = `${req.file.path}`;
-      const remainingPosts = posts.filter((post) => post._id !== req.params.id);
-      remainingPosts.push(post);
-      writePosts(remainingPosts);
-      res.send(post);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
-blogPostsRouter.put("/:id", async (req, res, next) => {
+//4 PUT blogPost
+blogPostsRouter.put("/:postId", (req, res, next) => {
   try {
-    const posts = getPosts();
-    const newPosts = posts.filter((post) => post._id !== req.params.id);
+    const posts = getBlogPostArray();
+    const remainingPosts = posts.filter(
+      (post) => post._id !== req.params.postId
+    );
     const modifiedPost = {
       ...req.body,
-      id: req.params.id,
+      id: req.params.postId,
       modifiedAt: new Date(),
     };
-    newPosts.push(modifiedPost);
-
-    writePosts(newPosts);
-    res.send(modifiedPost);
+    remainingPosts.push(modifiedPost);
+    writeBlogPosts(remainingPosts);
+    res.status(222).send("modified");
   } catch (error) {
     next(error);
   }
 });
-blogPostsRouter.delete("/:id", async (req, res, next) => {
+
+// 5. DELETE blogPost
+blogPostsRouter.delete("/:postId", (req, res, next) => {
   try {
-    const posts = getPosts();
-    const remainingPosts = posts.filter((post) => post._id !== req.params.id);
-    writePosts(remainingPosts);
+    const posts = getBlogPostArray();
+    const remainingPosts = posts.filter(
+      (post) => post._id !== req.params.postId
+    );
+    writeBlogPosts(remainingPosts);
     res.status(204).send();
   } catch (error) {
     next(error);
   }
 });
-export default blogPostRouter;
+export default blogPostsRouter;

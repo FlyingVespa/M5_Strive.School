@@ -15,27 +15,28 @@ const PORT = 3333;
 
 // ************************** MIDDLEWARES **************************
 
-const loggerMiddleware = (req, res, next) => {
-  console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
-  next(); // mandatory to give the control to what is happening next
-};
+// const loggerMiddleware = (req, res, next) => {
+//   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
+//   next(); // mandatory to give the control to what is happening next
+// };
 
-const loggerMiddleware2 = (req, res, next) => {
-  console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
-  next(); // mandatory to give the control to what is happening next
-};
+// const loggerMiddleware2 = (req, res, next) => {
+//   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
+//   next(); // mandatory to give the control to what is happening next
+// };
 
 server.use(cors());
 server.use(express.json());
-server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
+// server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
 server.use("/authors", authorsRouter);
-server.user("/blog", loggerMiddleware2, blogPostRouter);
+server.use("/blog", blogPostRouter);
 
 // *************************** ERROR MIDDLEWARES ***************************
 
-server.use(notFoundHandler);
-server.use(badRequestHandler);
+server.use(notFoundErrorHandler);
+server.use(badRequestErrorHandler);
 server.use(catchAllErrorHandler);
+
 console.table(listEndpoints(server));
 server.listen(PORT, () =>
   console.log(`✅ A portal has opened on ${PORT} , enter if you dare`)

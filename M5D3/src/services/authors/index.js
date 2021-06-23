@@ -5,7 +5,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import createError from "http-errors";
 import { validationResult } from "express-validator";
-// import { loggerMiddleware } from "./middlewares.js";
+// import { loggerMiddleware } from "../../server.js";
 // import { authorValidation } from "./authorValidation";
 
 export const loggerMiddleware = (req, res, next) => {
@@ -15,7 +15,7 @@ export const loggerMiddleware = (req, res, next) => {
 const authorsRouter = express.Router();
 const authorJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
-  "authors.json"
+  "../../jsondata/authors.json"
 );
 const getAuthorArray = () => {
   const content = fs.readFileSync(authorJSONpath);
@@ -25,9 +25,10 @@ const writeAuthor = (content) =>
   fs.writeFileSync(authorJSONpath, JSON.stringify(content));
 
 //1. GET ALL authors
-authorsRouter.get("/", loggerMiddleware, (req, res, next) => {
+authorsRouter.get("/", (req, res, next) => {
   try {
     const authors = getAuthorArray();
+    res.send("Send me something, just send me ANYTHING!!!");
     res.send(authors);
   } catch (error) {
     next(error);
@@ -81,14 +82,14 @@ authorsRouter.post("/", (req, res, next) => {
   }
 });
 
-//  update author
-authorsRouter.put("/:id", async (req, res, next) => {
+//  4. PUT Single author
+authorsRouter.put("/:authorId", async (req, res, next) => {
   try {
     const authors = getAuthorArray();
     const remainingAuthors = authors.filter(
-      (author) => author._id !== req.params.userId
+      (author) => author._id !== req.params.authorId
     );
-    const updatedAuthor = { ...req.body, _id: req.params.userId };
+    const updatedAuthor = { ...req.body, _id: req.params.authorId };
     remainingAuthors.push(updatedAuthor);
     writeAuthor(remainingAuthors);
     res.send(updatedAuthor);
@@ -98,11 +99,11 @@ authorsRouter.put("/:id", async (req, res, next) => {
 });
 
 //5. DELETE  author
-authorsRouter.delete("/:id", async (req, res, next) => {
+authorsRouter.delete("/:authorId", async (req, res, next) => {
   try {
     const authors = getAuthorArray();
     const remainingAuthors = authors.filter(
-      (author) => author._id !== req.params.authId
+      (author) => author._id !== req.params.authorId
     );
 
     writeAuthor(remainingAuthors);
