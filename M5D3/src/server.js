@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import listEndpoints from "express-list-endpoints";
 import authorsRouter from "./services/authors/index.js";
-import blogPostRouter from "./services/blogPosts/index.js";
+import blogPostsRouter from "./services/blogPosts/index.js";
 
 import {
   badRequestErrorHandler,
@@ -29,7 +29,7 @@ server.use(cors());
 server.use(express.json());
 // server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
 server.use("/authors", authorsRouter);
-server.use("/blog", blogPostRouter);
+server.use("/blog", blogPostsRouter);
 
 // *************************** ERROR MIDDLEWARES ***************************
 
