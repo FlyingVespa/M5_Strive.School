@@ -5,7 +5,6 @@ import createError from "http-errors";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { validationResult } from "express-validator";
-
 import postValidation from "./postValidation.js";
 
 const blogPostsRouter = express.Router();
