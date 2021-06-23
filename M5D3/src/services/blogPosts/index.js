@@ -1,32 +1,44 @@
 import express from "express";
-import { getPosts, writePosts } from "../lib/fs-helper.js";
 import uniqid from "uniqid";
-import { validationResult } from "express-validator";
 import createError from "http-errors";
-import { postValidation } from "./validator";
-import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
-// import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { validationResult } from "express-validator";
+import { postValidation } from "./postValidation";
+// import multer from "multer";
 
-const postsRouter = express.Router();
+const blogPostsRouter = express.Router();
+const blogPostsJSONpath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "blogPosts.json"
+);
 
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "Strive-Blog/Covers",
-  },
-});
+const getBlogPostArray = () => {
+  const content = fs.readFileSync(blogPostsJSONpath);
+  return JSON.parse(content);
+};
+const writeBlogPosts = (content) => {
+  fs.writeFileSync(blogPostsJSONpath, JSON.stringify(content));
+};
 
-postsRouter.get("/", async (req, res, next) => {
+//1. GET ALL blogPosts
+blogPostRouter.get("/", (req, res, next) => {
   try {
-    const posts = await getPosts();
-    res.send(posts);
+    const posts = getPosts();
+
+    if (req.query && req.query.title) {
+      const filteredBlogPost = posts.filter(
+        (post) => post.hasOwnProperty("title") && post.title === req.query.title
+      );
+
+      res.send(filteredBlogPost);
+    }
   } catch (error) {
     next(error);
   }
 });
 
-postsRouter.get("/:id", async (req, res, next) => {
+blogPostsRouter.get("/:id", async (req, res, next) => {
   try {
     const posts = await getPosts();
     const post = posts.find((post) => post._id === req.params.id);
@@ -36,7 +48,7 @@ postsRouter.get("/:id", async (req, res, next) => {
   }
 });
 
-postsRouter.post("/", postValidation, async (req, res, next) => {
+blogPostsRouter.post("/", postValidation, async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -54,7 +66,7 @@ postsRouter.post("/", postValidation, async (req, res, next) => {
   }
 });
 
-postsRouter.post(
+blogPostsRouter.post(
   "/:id/uploadCover",
   multer({ storage: cloudinaryStorage }).single("coverPicture"),
   async (req, res, next) => {
@@ -72,7 +84,7 @@ postsRouter.post(
   }
 );
 
-postsRouter.put("/:id", async (req, res, next) => {
+blogPostsRouter.put("/:id", async (req, res, next) => {
   try {
     const posts = await getPosts();
     const newPosts = posts.filter((post) => post._id !== req.params.id);
@@ -89,7 +101,7 @@ postsRouter.put("/:id", async (req, res, next) => {
     next(error);
   }
 });
-postsRouter.delete("/:id", async (req, res, next) => {
+blogPostsouter.delete("/:id", async (req, res, next) => {
   try {
     const posts = await getPosts();
     const remainingPosts = posts.filter((post) => post._id !== req.params.id);
@@ -99,4 +111,4 @@ postsRouter.delete("/:id", async (req, res, next) => {
     next(error);
   }
 });
-export default postsRouter;
+export default blogPostRouter;
