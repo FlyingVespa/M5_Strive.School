@@ -33,7 +33,11 @@ usersRouter.get("/:id", (req, res, next) => {
     res.send("this is coming from SINGLE user GET endpoint");
     const users = getUsersArray();
     const user = users.find((u) => u._id === req.params.userId);
-    res.send(user);
+    if (user) {
+      res.send(user);
+    } else {
+      next(createError(404, `user with id ${req.params.userId} not found!`));
+    }
   } catch (error) {
     next(error);
   }

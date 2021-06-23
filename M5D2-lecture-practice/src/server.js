@@ -4,6 +4,10 @@ import cors from "cors";
 
 import usersRouter from "./services/users/index.js";
 import booksRouter from "./services/books/index.js";
+import {
+  badRequestMiddleware,
+  notFoundErrorMiddleware,
+} from "./errorMiddleWares.js";
 
 const port = 3001;
 
@@ -31,7 +35,8 @@ server.use("/users", usersRouter);
 server.use("/books", loggerMiddleware2, booksRouter); // loggerMiddleware2 is a ROUTER LEVEL MIDDLEWARE
 
 // *************************** ERROR HANDLERS ***************************
-
+server.use(notFoundErrorMiddleware);
+server.use(badRequestMiddleware);
 server.user(catchErrorMiddleware);
 console.table(listEndpoints(server));
 
