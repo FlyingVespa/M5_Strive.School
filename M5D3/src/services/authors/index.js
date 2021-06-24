@@ -29,7 +29,7 @@ const writeAuthor = (content) =>
 authorsRouter.get("/", (req, res, next) => {
   try {
     const authors = getAuthorArray();
-    res.send("Send me something, just send me ANYTHING!!!");
+    // res.send("Send me something, just send me ANYTHING!!!");
     res.send(authors);
   } catch (error) {
     next(error);
@@ -40,7 +40,6 @@ authorsRouter.get("/", (req, res, next) => {
 authorsRouter.get("/:authorId", (req, res, next) => {
   try {
     const authors = getAuthorArray();
-    // const author = users.find((author) => author._id === req.params.authorId);
     const author = authors.find((author) => author._id === req.params.authorId);
     if (author) {
       res.send(author);

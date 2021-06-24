@@ -5,6 +5,10 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import createError from "http-errors";
 import { validationResult } from "express-validator";
+import { getAuthors, getBlogPosts } from "../../lib/fs-tools";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+
 // import { loggerMiddleware } from "../../server.js";
 // import { authorValidation } from "./authorValidation";
 
@@ -14,6 +18,13 @@ export const loggerMiddleware = (req, res, next) => {
 
 const authorsRouter = express.Router();
 
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "Strive-Blog/Avatars",
+  },
+});
+
 const authorJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../jsondata/authors.json"
@@ -22,14 +33,14 @@ const getAuthorArray = () => {
   const content = fs.readFileSync(authorJSONpath);
   return JSON.parse(content);
 };
+
 const writeAuthor = (content) =>
   fs.writeFileSync(authorJSONpath, JSON.stringify(content));
 
 //1. GET ALL authors
-authorsRouter.get("/", (req, res, next) => {
+authorsRouter.get("/", async (req, res, next) => {
   try {
-    const authors = getAuthorArray();
-    res.send("Send me something, just send me ANYTHING!!!");
+    const authors = await getAuthorArray();
     res.send(authors);
   } catch (error) {
     next(error);
@@ -37,9 +48,9 @@ authorsRouter.get("/", (req, res, next) => {
 });
 
 //2, GET SINGLE author
-authorsRouter.get("/:authorId", (req, res, next) => {
+authorsRouter.get("/:authorId", async (req, res, next) => {
   try {
-    const authors = getAuthorArray();
+    const authors = await getAuthorArray();
     // const author = users.find((author) => author._id === req.params.authorId);
     const author = authors.find((author) => author._id === req.params.authorId);
     if (author) {
@@ -59,43 +70,64 @@ authorsRouter.get("/:authorId", (req, res, next) => {
 });
 
 //3. POST author
-authorsRouter.post("/", (req, res, next) => {
+authorsRouter.post("/", async (req, res, next) => {
   try {
+    const errors = validationResult(req);
     if (errors.isEmpty()) {
-      const { name, surname, email, dateOfBirth } = req.body;
-      const newAuthor = { ...req.body, _id: uniqid(), createdAt: new Date() };
-      const authors = getAuthorArray();
+      const { name, surname, email, dob } = req.body;
+      const newAuthor = {
+        _id: uniqid(),
+        first_name,
+        last_name,
+        email,
+        dob,
+        avatar: `https://ui-avatars.com/api/?name=${name}+${surname}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const authors = await getAuthorArray();
       authors.push(newAuthor);
-      writeAuthor(authors);
+      await writeAuthor(authors);
       res.status(201).send({ _id: newAuthor._id });
     } else {
       next(createError(400, { erroList: errors }));
     }
-    // const author = {
-    //   id: uniqid(),
-    //   name,
-    //   surname,
-    //   email,
-    //   dateOfBirth,
-    //   avatar: `https://ui-avatars.com/api/?name=${name}+${surname}`,
-    //   createdAt: new Date(),
-    //   updatedAt: new Date(),
-    // };
   } catch (error) {
     next(error);
   }
 });
 
+authorsRouter.post(
+  "/:id/uploadAvatar",
+  multer({ storage: cloudinaryStorage }).single("avatarPicture"),
+  async (req, res, next) => {
+    try {
+      const authors = await getAuthors();
+      const author = authors.find((author) => author._id === req.params.id);
+      author.avatar = `${req.file.path}`;
+      const remainingAuthors = authors.filter(
+        (author) => author._id !== req.params.id
+      );
+      remainingAuthors.push(author);
+      await writeAuthor(remainingAuthors);
+      res.send(author);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
 //  4. PUT Single author
 authorsRouter.put("/:authorId", async (req, res, next) => {
   try {
-    const authors = getAuthorArray();
+    const authors = await getAuthorArray();
     const remainingAuthors = authors.filter(
       (author) => author._id !== req.params.authorId
     );
     const updatedAuthor = { ...req.body, _id: req.params.authorId };
     remainingAuthors.push(updatedAuthor);
-    writeAuthor(remainingAuthors);
+    await writeAuthor(remainingAuthors);
     res.send(updatedAuthor);
   } catch (error) {
     next(error);
@@ -105,12 +137,12 @@ authorsRouter.put("/:authorId", async (req, res, next) => {
 //5. DELETE  author
 authorsRouter.delete("/:authorId", async (req, res, next) => {
   try {
-    const authors = getAuthorArray();
+    const authors = await getAuthorArray();
     const remainingAuthors = authors.filter(
       (author) => author._id !== req.params.authorId
     );
 
-    writeAuthor(remainingAuthors);
+    await writeAuthor(remainingAuthors);
     res.status(200).send("Deleted!");
   } catch (error) {
     next(error);
