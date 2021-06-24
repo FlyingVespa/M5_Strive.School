@@ -4,7 +4,7 @@ import listEndpoints from "express-list-endpoints";
 
 import authorsRouter from "./services/authors/index.js";
 import blogPostsRouter from "./services/blogPosts/index.js";
-
+import commentsRouter from "./services/comments/index.js";
 import {
   badRequestErrorHandler,
   notFoundErrorHandler,
@@ -34,7 +34,7 @@ server.use(express.json());
 // server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
 server.use("/author", authorsRouter);
 server.use("/blog", loggerMiddleware2, blogPostsRouter);
-
+server.use("/blog/comments", commentsRouter);
 // *************************** ERROR MIDDLEWARES ***************************
 
 server.use(notFoundErrorHandler);

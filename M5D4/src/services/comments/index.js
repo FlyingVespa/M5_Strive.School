@@ -1,17 +1,19 @@
 import express from "express"; // 3rd party package
-import multer from "multer";
+import multer from "multer"; // 3rd party package
 import uniqid from "uniqid"; // 3rd party package
-import createError from "http-errors";
-import { validationResult } from "express-validator";
-import { postsValidation, commentsValidation } from "./validation.js";
-import {
-  getBlogPosts,
-  writeCoverImgs,
-  writeToBlog,
-  getComments,
-} from "../../lib/fs-tools.js";
+import createError from "http-errors"; // 3rd party package
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import { validationResult } from "express-validator"; // 3rd party package
+// import { postsValidation, commentsValidation } from "./validation.js";
+// import {} from "../../lib/fs-tools.js"; // own package
 
 const commentsRouter = express.Router();
+
+const getComments = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../jsondata/comments.json"
+);
 
 //1. GET ALL comments
 commentsRouter.get("/:id/comments", async (req, res, next) => {
@@ -48,29 +50,26 @@ commentsRouter.get("/:id/comments/:commentId", async (req, res, next) => {
 
 // 3  POST A COMMENT
 commentsRouter.post("/:id/comments", async (req, res, next) => {
-    try {
-    const errors = validationResult(req)
-    if(errors.isEmpty()){
-        const { text,image } = req.body
-        const comments = getComments();
-const newComment = {
-    _id:uniqid(),
-    author: this.params.id,
-    image,
-    text,
-    createdAt: new Date();
-    updatedAt: new Date();
-}
-const comments = await getComments();
-comments.push(newComment)
-    } else{
-        next(createError(400, {errorList:error}))
+  try {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+      const { text, image } = req.body;
+      const comments = getComments();
+      const newComment = {
+        _id: uniqid(),
+        author: this.params.id,
+        image,
+        text,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      comments.push(newComment);
+    } else {
+      next(createError(400, { errorList: error }));
     }
-
-} catch (error) {
-    next(error)
-}
-
+  } catch (error) {
+    next(error);
+  }
 });
 
 // 4 PUT COMMENT
@@ -88,17 +87,18 @@ commentsRouter.put("/:id/comments/:commentId", async (req, res, next) => {
   }
 });
 
-//  5 DELETE comment 
+//  5 DELETE comment
 commentsRouter.delete("/:id/comments/:commentId", async (req, res, next) => {
-    try {
-      const comments = await getComments();
-      const remainingComments = comments.filter(
-        (comment) => comment._id !== req.params.commentsId
-      );
-      const updatedComment = { ...req.body, _id: req.params.commentId };
-      await writeComment.(remainingComments)
-      res.status(200).send("Comment has been exterminated");
-    } catch (error) {
-      next(error);
-    }
-  });
+  try {
+    const comments = await getComments();
+    const remainingComments = comments.filter(
+      (comment) => comment._id !== req.params.commentsId
+    );
+    const updatedComment = { ...req.body, _id: req.params.commentId };
+    await writeComment(remainingComments);
+    res.status(200).send("Comment has been exterminated");
+  } catch (error) {
+    next(error);
+  }
+});
+export default commentsRouter;
