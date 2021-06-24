@@ -12,7 +12,7 @@ import {
 } from "./errorHandlers.js";
 
 const server = express();
-const PORT = 3333;
+const PORT = 3222;
 
 // ************************** MIDDLEWARES **************************
 
