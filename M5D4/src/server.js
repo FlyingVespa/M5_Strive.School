@@ -12,8 +12,11 @@ import {
 } from "./errorHandlers.js";
 
 const server = express();
-const PORT = 3333;
-
+const PORT = 3222;
+const publicFolderPath = join(
+  getCurrentFolderPath(import.meta.url),
+  "../public"
+);
 // ************************** MIDDLEWARES **************************
 
 // const loggerMiddleware = (req, res, next) => {
@@ -25,7 +28,7 @@ const loggerMiddleware2 = (req, res, next) => {
   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
   next(); // mandatory to give the control to what is happening next
 };
-
+server.use(express.static(publicFolderPath));
 server.use(cors());
 server.use(express.json());
 // server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
