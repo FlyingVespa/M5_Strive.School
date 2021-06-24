@@ -13,6 +13,10 @@ const blogPostsJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../jsondata/blogPosts.json"
 );
+const commentsJSONpath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../jsondata/comments.json"
+);
 const authorsPublicFolderPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../public/img/users"
@@ -20,17 +24,14 @@ const authorsPublicFolderPath = join(
 
 export const getAuthors = async () => readJSON(authorsJSONpath);
 export const getBlogPosts = async () => readJSON(blogPostsJSONpath);
-
+export const getComments = async () => readJSON(commentsJSONpath);
 export const writeAuthors = async (content) =>
   writeJSON(authorJSONspath, content);
 export const writeBlogPosts = async (content) =>
   writeJSON(blogPostsJSONpath, content);
-
 export const getCurrentFolderPath = async (currentFile) =>
   dir(fileURLToPath(currentFile));
-
 export const writeCoverPicture = async (fileName, content) =>
   await writeFile(join(blogPostsJSONpath, fileName), content);
-
 export const writeAuthorImage = async (filename, content) =>
   writeFile(join(authorsPublicFolderPath, filename), content);

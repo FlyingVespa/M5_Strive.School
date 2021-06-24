@@ -5,9 +5,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import createError from "http-errors";
 import { validationResult } from "express-validator";
-import { getAuthors, getBlogPosts } from "../../lib/fs-tools";
-import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+// import { getAuthors, getBlogPosts } from "../../lib/fs-tools";
 
 // import { loggerMiddleware } from "../../server.js";
 // import { authorValidation } from "./authorValidation";
@@ -17,13 +15,6 @@ export const loggerMiddleware = (req, res, next) => {
 };
 
 const authorsRouter = express.Router();
-
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "Strive-Blog/Avatars",
-  },
-});
 
 const authorJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -51,7 +42,6 @@ authorsRouter.get("/", async (req, res, next) => {
 authorsRouter.get("/:authorId", async (req, res, next) => {
   try {
     const authors = await getAuthorArray();
-    // const author = users.find((author) => author._id === req.params.authorId);
     const author = authors.find((author) => author._id === req.params.authorId);
     if (author) {
       res.send(author);
@@ -96,27 +86,6 @@ authorsRouter.post("/", async (req, res, next) => {
     next(error);
   }
 });
-
-authorsRouter.post(
-  "/:id/uploadAvatar",
-  multer({ storage: cloudinaryStorage }).single("avatarPicture"),
-  async (req, res, next) => {
-    try {
-      const authors = await getAuthors();
-      const author = authors.find((author) => author._id === req.params.id);
-      author.avatar = `${req.file.path}`;
-      const remainingAuthors = authors.filter(
-        (author) => author._id !== req.params.id
-      );
-      remainingAuthors.push(author);
-      await writeAuthor(remainingAuthors);
-      res.send(author);
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
-  }
-);
 
 //  4. PUT Single author
 authorsRouter.put("/:authorId", async (req, res, next) => {
