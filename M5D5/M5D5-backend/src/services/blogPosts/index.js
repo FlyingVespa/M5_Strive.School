@@ -6,24 +6,15 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { validationResult } from "express-validator";
 import postValidation from "./postValidation.js";
+import { writeToFile, readFile } from "../../utils/fs-tools.js";
+import { read } from "fs-extra";
 
 const blogPostsRouter = express.Router();
-const blogPostsJSONpath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../jsondata/blogPosts.json"
-);
-const getBlogPostArray = () => {
-  const content = fs.readFileSync(blogPostsJSONpath);
-  return JSON.parse(content);
-};
-const writeBlogPosts = (content) => {
-  fs.writeFileSync(blogPostsJSONpath, JSON.stringify(content));
-};
 
 //1. GET ALL blogPosts
 blogPostsRouter.get("/", async (req, res, next) => {
   try {
-    const posts = await getBlogPostArray();
+    const posts = await readFile("blogPosts.json");
     res.send(posts);
   } catch (error) {
     next(error);
@@ -33,7 +24,7 @@ blogPostsRouter.get("/", async (req, res, next) => {
 //2 GET Single Post
 blogPostsRouter.get("/:blogId", postValidation, (req, res, next) => {
   try {
-    const posts = getBlogPostArray();
+    const posts = readFile("blogPosts.json");
     const post = posts.find((post) => post._id === req.params.blogId);
     if (post) {
       res.send(post);
@@ -70,7 +61,7 @@ blogPostsRouter.post("/", (req, res, next) => {
         updatedAt: new Date(),
       };
 
-      const posts = getBlogPostArray();
+      const posts = readFile("blogPosts.json");
       posts.push(newPost);
       writeBlogPosts(posts);
       res.status(201).send({ _id: newPost._id });
@@ -85,7 +76,7 @@ blogPostsRouter.post("/", (req, res, next) => {
 //4 PUT blogPost
 blogPostsRouter.put("/:blogId", (req, res, next) => {
   try {
-    const posts = getBlogPostArray();
+    const posts = readFile("blogPosts.json");
     const remainingPosts = posts.filter(
       (post) => post._id !== req.params.blogId
     );
@@ -105,11 +96,11 @@ blogPostsRouter.put("/:blogId", (req, res, next) => {
 // 5. DELETE blogPost
 blogPostsRouter.delete("/:blogId", (req, res, next) => {
   try {
-    const posts = getBlogPostArray();
+    const posts = readFile("blogPosts.json");
     const remainingPosts = posts.filter(
       (post) => post._id !== req.params.blogId
     );
-    writeBlogPosts(remainingPosts);
+    writeToFile("blogPosts.json", remainingPosts);
     res.status(204).send();
   } catch (error) {
     next(error);

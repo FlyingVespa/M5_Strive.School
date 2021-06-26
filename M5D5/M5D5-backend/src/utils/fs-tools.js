@@ -8,13 +8,13 @@ import multer from "multer";
 const { readJSON, writeJSON } = fs;
 
 // PATHS
-export const getDataFilePath = async (fileName) =>
-  await join(dirname(fileURLToPath(import.meta.url)), "../jsondata/", fileName);
+export const getDataFilePath = (fileName) =>
+  join(dirname(fileURLToPath(import.meta.url)), "../jsondata/", fileName);
 
 //  JSON PARSED ARRAYS
-export const readFile = async (filename) => {
-  const jsonFilePath = getDataFilePath(filena);
-  const jsonfile = await fs.readJSON(jsonFilePath);
+export const readFile = async (fileName) => {
+  const test = getDataFilePath(fileName);
+  const jsonfile = await fs.readJSON(test);
   return jsonfile;
 };
 
