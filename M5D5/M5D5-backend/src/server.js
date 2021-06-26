@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import listEndpoints from "express-list-endpoints";
 
 import authorsRouter from "./services/authors/index.js";
@@ -10,12 +11,11 @@ import {
   notFoundErrorHandler,
   catchAllErrorHandler,
 } from "./errorHandlers.js";
-import dotenv from "env";
 dotenv.config();
 console.log(process.env.PORT);
-
+const { PORT } = process.env;
 const server = express();
-const PORT = 3222;
+// const PORT = 3222;
 // const publicFolderPath = join(
 //   getCurrentFolderPath(import.meta.url),
 //   "../public"
@@ -37,7 +37,7 @@ server.use(express.json());
 // server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
 server.use("/author", authorsRouter);
 server.use("/blog", loggerMiddleware2, blogPostsRouter);
-server.use("/blog/comments", commentsRouter);
+server.use("/blog", commentsRouter);
 // *************************** ERROR MIDDLEWARES ***************************
 
 server.use(notFoundErrorHandler);

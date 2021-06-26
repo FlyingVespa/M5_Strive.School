@@ -16,7 +16,7 @@ const getComments = join(
 );
 
 //1. GET ALL comments
-commentsRouter.get("/:id/comments", async (req, res, next) => {
+commentsRouter.get("/:blogId/comments", async (req, res, next) => {
   try {
     console.log("getting all people's opions, thoughts and utterances");
     const comments = await getComments();
@@ -26,30 +26,30 @@ commentsRouter.get("/:id/comments", async (req, res, next) => {
   }
 });
 // 2 GET SINGLE COMMENT
-commentsRouter.get("/:id/comments/:commentId", async (req, res, next) => {
-  try {
-    const comments = await getComments();
-    const comment = comments.find(
-      (comment) => comment._id === req.params.commentId
-    );
-    if (comment) {
-      res.send(comment);
-      console.log("getting a person's unvalidaded opinion");
-    } else {
-      next(
-        createError(
-          404,
-          "This comment is not found, try again, or look for a more valid comment"
-        )
-      );
-    }
-  } catch (error) {
-    next(error);
-  }
-});
+// commentsRouter.get("/:blogId/comments/:commentId", async (req, res, next) => {
+//   try {
+//     const comments = await getComments();
+//     const comment = comments.find(
+//       (comment) => comment._id === req.params.commentId
+//     );
+//     if (comment) {
+//       res.send(comment);
+//       console.log("getting a person's unvalidaded opinion");
+//     } else {
+//       next(
+//         createError(
+//           404,
+//           "This comment is not found, try again, or look for a more valid comment"
+//         )
+//       );
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 // 3  POST A COMMENT
-commentsRouter.post("/:id/comments", async (req, res, next) => {
+commentsRouter.post("/:blogId/comments", async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
@@ -73,7 +73,7 @@ commentsRouter.post("/:id/comments", async (req, res, next) => {
 });
 
 // 4 PUT COMMENT
-commentsRouter.put("/:id/comments/:commentId", async (req, res, next) => {
+commentsRouter.put("/:blogId/comments", async (req, res, next) => {
   try {
     const comments = await getComments();
     const remainingComments = comments.filter(
@@ -88,17 +88,17 @@ commentsRouter.put("/:id/comments/:commentId", async (req, res, next) => {
 });
 
 //  5 DELETE comment
-commentsRouter.delete("/:id/comments/:commentId", async (req, res, next) => {
-  try {
-    const comments = await getComments();
-    const remainingComments = comments.filter(
-      (comment) => comment._id !== req.params.commentsId
-    );
-    const updatedComment = { ...req.body, _id: req.params.commentId };
-    await writeComment(remainingComments);
-    res.status(200).send("Comment has been exterminated");
-  } catch (error) {
-    next(error);
-  }
-});
+// commentsRouter.delete("/:id/comments/:commentId", async (req, res, next) => {
+//   try {
+//     const comments = await getComments();
+//     const remainingComments = comments.filter(
+//       (comment) => comment._id !== req.params.commentsId
+//     );
+//     const updatedComment = { ...req.body, _id: req.params.commentId };
+//     await writeComment(remainingComments);
+//     res.status(200).send("Comment has been exterminated");
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 export default commentsRouter;

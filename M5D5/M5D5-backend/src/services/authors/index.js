@@ -15,7 +15,6 @@ export const loggerMiddleware = (req, res, next) => {
 };
 
 const authorsRouter = express.Router();
-
 const authorJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../jsondata/authors.json"
@@ -24,7 +23,6 @@ const getAuthorArray = () => {
   const content = fs.readFileSync(authorJSONpath);
   return JSON.parse(content);
 };
-
 const writeAuthor = (content) =>
   fs.writeFileSync(authorJSONpath, JSON.stringify(content));
 
@@ -64,14 +62,14 @@ authorsRouter.post("/", async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
-      const { name, surname, email, dob } = req.body;
+      const { first_name, last_name, email, dob } = req.body;
       const newAuthor = {
         _id: uniqid(),
         first_name,
         last_name,
         email,
         dob,
-        avatar: `https://ui-avatars.com/api/?name=${name}+${surname}`,
+        avatar: `https://ui-avatars.com/api/?name=${first_name}+${last_name}`,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

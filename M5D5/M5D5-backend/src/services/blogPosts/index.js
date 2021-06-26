@@ -8,25 +8,22 @@ import { validationResult } from "express-validator";
 import postValidation from "./postValidation.js";
 
 const blogPostsRouter = express.Router();
-
 const blogPostsJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../jsondata/blogPosts.json"
 );
-
 const getBlogPostArray = () => {
   const content = fs.readFileSync(blogPostsJSONpath);
   return JSON.parse(content);
 };
-
 const writeBlogPosts = (content) => {
   fs.writeFileSync(blogPostsJSONpath, JSON.stringify(content));
 };
 
 //1. GET ALL blogPosts
-blogPostsRouter.get("/", (req, res, next) => {
+blogPostsRouter.get("/", async (req, res, next) => {
   try {
-    const posts = getBlogPostArray();
+    const posts = await getBlogPostArray();
     res.send(posts);
   } catch (error) {
     next(error);
@@ -34,10 +31,10 @@ blogPostsRouter.get("/", (req, res, next) => {
 });
 
 //2 GET Single Post
-blogPostsRouter.get("/:id", postValidation, (req, res, next) => {
+blogPostsRouter.get("/:blogId", postValidation, (req, res, next) => {
   try {
     const posts = getBlogPostArray();
-    const post = posts.find((post) => post._id === req.params.id);
+    const post = posts.find((post) => post._id === req.params.blogId);
     if (post) {
       res.send(post);
     } else {
@@ -67,13 +64,15 @@ blogPostsRouter.post("/", (req, res, next) => {
 });
 
 //4 PUT blogPost
-blogPostsRouter.put("/:id", (req, res, next) => {
+blogPostsRouter.put("/:blogId", (req, res, next) => {
   try {
     const posts = getBlogPostArray();
-    const remainingPosts = posts.filter((post) => post._id !== req.params.id);
+    const remainingPosts = posts.filter(
+      (post) => post._id !== req.params.blogId
+    );
     const modifiedPost = {
       ...req.body,
-      id: req.params.postId,
+      id: req.params.blogId,
       modifiedAt: new Date(),
     };
     remainingPosts.push(modifiedPost);
@@ -85,10 +84,12 @@ blogPostsRouter.put("/:id", (req, res, next) => {
 });
 
 // 5. DELETE blogPost
-blogPostsRouter.delete("/:id", (req, res, next) => {
+blogPostsRouter.delete("/:blogId", (req, res, next) => {
   try {
     const posts = getBlogPostArray();
-    const remainingPosts = posts.filter((post) => post._id !== req.params.id);
+    const remainingPosts = posts.filter(
+      (post) => post._id !== req.params.blogId
+    );
     writeBlogPosts(remainingPosts);
     res.status(204).send();
   } catch (error) {
