@@ -63,7 +63,7 @@ blogPostsRouter.post("/", (req, res, next) => {
 
       const posts = readFile("blogPosts.json");
       posts.push(newPost);
-      writeBlogPosts(posts);
+      writeToFile("blogPosts.json", posts);
       res.status(201).send({ _id: newPost._id });
     } else {
       next(createError(400, { errorsList: errors }));
@@ -86,7 +86,7 @@ blogPostsRouter.put("/:blogId", (req, res, next) => {
       modifiedAt: new Date(),
     };
     remainingPosts.push(modifiedPost);
-    writeBlogPosts(remainingPosts);
+    writeToFile("blogPosts.json", remainingPosts);
     res.status(222).send("modified");
   } catch (error) {
     next(error);
