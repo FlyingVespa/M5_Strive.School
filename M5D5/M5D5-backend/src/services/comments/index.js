@@ -2,6 +2,7 @@ import express from "express"; // 3rd party package
 import multer from "multer"; // 3rd party package
 import uniqid from "uniqid"; // 3rd party package
 import createError from "http-errors"; // 3rd party package
+import fs from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { validationResult } from "express-validator"; // 3rd party package
@@ -9,11 +10,14 @@ import { validationResult } from "express-validator"; // 3rd party package
 // import {} from "../../lib/fs-tools.js"; // own package
 
 const commentsRouter = express.Router();
-
-const getComments = join(
+const commentsJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../jsondata/comments.json"
 );
+const getComments = () => {
+  const content = fs.readFileSync(commentsJSONpath);
+  return JSON.parse(content);
+};
 
 //1. GET ALL comments
 commentsRouter.get("/:blogId/comments", async (req, res, next) => {
@@ -26,27 +30,27 @@ commentsRouter.get("/:blogId/comments", async (req, res, next) => {
   }
 });
 // 2 GET SINGLE COMMENT
-// commentsRouter.get("/:blogId/comments/:commentId", async (req, res, next) => {
-//   try {
-//     const comments = await getComments();
-//     const comment = comments.find(
-//       (comment) => comment._id === req.params.commentId
-//     );
-//     if (comment) {
-//       res.send(comment);
-//       console.log("getting a person's unvalidaded opinion");
-//     } else {
-//       next(
-//         createError(
-//           404,
-//           "This comment is not found, try again, or look for a more valid comment"
-//         )
-//       );
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+commentsRouter.get("/:blogId/comments/:commentId", async (req, res, next) => {
+  try {
+    const comments = await getComments();
+    const comment = comments.find(
+      (comment) => comment._id === req.params.commentId
+    );
+    if (comment) {
+      res.send(comment);
+      console.log("getting a person's unvalidaded opinion");
+    } else {
+      next(
+        createError(
+          404,
+          "This comment is not found, try again, or look for a more valid comment"
+        )
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 // 3  POST A COMMENT
 commentsRouter.post("/:blogId/comments", async (req, res, next) => {
@@ -57,7 +61,7 @@ commentsRouter.post("/:blogId/comments", async (req, res, next) => {
       const comments = getComments();
       const newComment = {
         _id: uniqid(),
-        author: this.params.id,
+
         image,
         text,
         createdAt: new Date(),

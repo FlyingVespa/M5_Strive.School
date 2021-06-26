@@ -1,35 +1,31 @@
 import express from "express";
-import fs from "fs";
+import fs from "fs-extra";
 import uniqid from "uniqid";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import createError from "http-errors";
 import { validationResult } from "express-validator";
-// import { getAuthors, getBlogPosts } from "../../lib/fs-tools";
-
-// import { loggerMiddleware } from "../../server.js";
-// import { authorValidation } from "./authorValidation";
+import {
+  writeToFile,
+  readFile,
+  getAuthors,
+  getDataFilePath,
+} from "../../utils/fs-tools.js";
 
 export const loggerMiddleware = (req, res, next) => {
   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
 };
 
 const authorsRouter = express.Router();
-const authorJSONpath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../jsondata/authors.json"
-);
-const getAuthorArray = () => {
-  const content = fs.readFileSync(authorJSONpath);
-  return JSON.parse(content);
-};
-const writeAuthor = (content) =>
-  fs.writeFileSync(authorJSONpath, JSON.stringify(content));
+// const getAuthorArray = async (cont) => {
+//   const content = await fs.readFile(getDataFilePath(cont));
+//   return JSON.parse(content);
+// };
 
 //1. GET ALL authors
 authorsRouter.get("/", async (req, res, next) => {
   try {
-    const authors = await getAuthorArray();
+    const authors = await getAuthors("authors.json");
     res.send(authors);
   } catch (error) {
     next(error);
@@ -39,7 +35,7 @@ authorsRouter.get("/", async (req, res, next) => {
 //2, GET SINGLE author
 authorsRouter.get("/:authorId", async (req, res, next) => {
   try {
-    const authors = await getAuthorArray();
+    const authors = await getDataFilePath("authors.json");
     const author = authors.find((author) => author._id === req.params.authorId);
     if (author) {
       res.send(author);
@@ -73,9 +69,9 @@ authorsRouter.post("/", async (req, res, next) => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const authors = await getAuthorArray();
+      const authors = await getDataFilePath("authors.json");
       authors.push(newAuthor);
-      await writeAuthor(authors);
+      await writeToFile("authors.json", authors);
       res.status(201).send({ _id: newAuthor._id });
     } else {
       next(createError(400, { erroList: errors }));
@@ -88,13 +84,13 @@ authorsRouter.post("/", async (req, res, next) => {
 //  4. PUT Single author
 authorsRouter.put("/:authorId", async (req, res, next) => {
   try {
-    const authors = await getAuthorArray();
+    const authors = await getDataFilePath("authors.json");
     const remainingAuthors = authors.filter(
       (author) => author._id !== req.params.authorId
     );
     const updatedAuthor = { ...req.body, _id: req.params.authorId };
     remainingAuthors.push(updatedAuthor);
-    await writeAuthor(remainingAuthors);
+    await writeToFile("authors.json", remainingAuthors);
     res.send(updatedAuthor);
   } catch (error) {
     next(error);
@@ -104,12 +100,12 @@ authorsRouter.put("/:authorId", async (req, res, next) => {
 //5. DELETE  author
 authorsRouter.delete("/:authorId", async (req, res, next) => {
   try {
-    const authors = await getAuthorArray();
+    const authors = await getDataFilePath("authors.json");
     const remainingAuthors = authors.filter(
       (author) => author._id !== req.params.authorId
     );
 
-    await writeAuthor(remainingAuthors);
+    await writeToFile("authors.json", remainingAuthors);
     res.status(200).send("Deleted!");
   } catch (error) {
     next(error);

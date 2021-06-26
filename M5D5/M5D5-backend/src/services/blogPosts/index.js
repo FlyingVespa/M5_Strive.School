@@ -38,7 +38,12 @@ blogPostsRouter.get("/:blogId", postValidation, (req, res, next) => {
     if (post) {
       res.send(post);
     } else {
-      next(createError(404, "this is an error , your problem fix it."));
+      next(
+        createError(
+          404,
+          `the blog post id:${req.params.blogId}, is most likely deleted or never existed or pehaps hiding...`
+        )
+      );
     }
   } catch (error) {
     next(error);
@@ -50,7 +55,21 @@ blogPostsRouter.post("/", (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
-      const newPost = { ...req.body, _id: uniqid(), createdAt: new Date() };
+      const { category, cover, content, title, author, readTime } = req.body;
+      const { name, avatar } = req.body.author;
+      const { value, unit } = req.body.readTime;
+      const newPost = {
+        _id: uniqid(),
+        category,
+        cover,
+        title,
+        content,
+        author,
+        readTime,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       const posts = getBlogPostArray();
       posts.push(newPost);
       writeBlogPosts(posts);
