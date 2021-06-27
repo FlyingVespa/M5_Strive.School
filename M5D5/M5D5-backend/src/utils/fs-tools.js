@@ -23,7 +23,7 @@ export const writeToFile = async (filename, content) => {
   await fs.writeFileSync(getDataFilePath(filename), JSON.stringify(content));
 };
 
-const convertFile = multer();
+export const convertFile = multer();
 export const uploadFile = async (req, res, next) => {
   try {
     console.log(req.file);

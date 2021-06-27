@@ -5,7 +5,12 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import createError from "http-errors";
 import { validationResult } from "express-validator";
-import { writeToFile, readFile } from "../../utils/fs-tools.js";
+import {
+  writeToFile,
+  readFile,
+  convertFile,
+  uploadFile,
+} from "../../utils/fs-tools.js";
 
 export const loggerMiddleware = (req, res, next) => {
   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
@@ -100,6 +105,17 @@ authorsRouter.delete("/:authorId", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+//POST auhthor avatar
+authorsRouter.post("/:authorId/uploadAvatar", async (req, res, next) => {
+  try {
+    const authorsAvatar = readFile("../public");
+
+    const newAvatar = "test";
+    authorsAvatar.push(newAvatar);
+    await writeToFile("../public", authorsAvatar);
+  } catch (error) {}
 });
 
 export default authorsRouter;

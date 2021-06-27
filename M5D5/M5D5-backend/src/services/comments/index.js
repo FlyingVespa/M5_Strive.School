@@ -2,7 +2,7 @@ import express from "express"; // 3rd party package
 import multer from "multer"; // 3rd party package
 import uniqid from "uniqid"; // 3rd party package
 import createError from "http-errors"; // 3rd party package
-import fs from "fs";
+import { writeToFile, readFile } from "../../utils/fs-tools.js";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { validationResult } from "express-validator"; // 3rd party package
@@ -14,16 +14,16 @@ const commentsJSONpath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../jsondata/comments.json"
 );
-const getComments = () => {
-  const content = fs.readFileSync(commentsJSONpath);
-  return JSON.parse(content);
-};
+// const getComments = () => {
+//   const content = fs.readFileSync(commentsJSONpath);
+//   return JSON.parse(content);
+// };
 
 //1. GET ALL comments
 commentsRouter.get("/:blogId/comments", async (req, res, next) => {
   try {
     console.log("getting all people's opions, thoughts and utterances");
-    const comments = await getComments();
+    const comments = await readFile("comments.json");
     res.send(comments);
   } catch (error) {
     next(error);
@@ -32,7 +32,7 @@ commentsRouter.get("/:blogId/comments", async (req, res, next) => {
 // 2 GET SINGLE COMMENT
 commentsRouter.get("/:blogId/comments/:commentId", async (req, res, next) => {
   try {
-    const comments = await getComments();
+    const comments = await readFile("comments.json");
     const comment = comments.find(
       (comment) => comment._id === req.params.commentId
     );
@@ -57,12 +57,11 @@ commentsRouter.post("/:blogId/comments", async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
-      const { text, image } = req.body;
-      const comments = getComments();
+      const { text, author } = req.body;
+      const comments = await readFile("comments.json");
       const newComment = {
         _id: uniqid(),
-
-        image,
+        author,
         text,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -79,7 +78,7 @@ commentsRouter.post("/:blogId/comments", async (req, res, next) => {
 // 4 PUT COMMENT
 commentsRouter.put("/:blogId/comments", async (req, res, next) => {
   try {
-    const comments = await getComments();
+    const comments = await readFile("comments.json");
     const remainingComments = comments.filter(
       (comment) => comment._id !== req.params.commentsId
     );
@@ -91,18 +90,4 @@ commentsRouter.put("/:blogId/comments", async (req, res, next) => {
   }
 });
 
-//  5 DELETE comment
-// commentsRouter.delete("/:id/comments/:commentId", async (req, res, next) => {
-//   try {
-//     const comments = await getComments();
-//     const remainingComments = comments.filter(
-//       (comment) => comment._id !== req.params.commentsId
-//     );
-//     const updatedComment = { ...req.body, _id: req.params.commentId };
-//     await writeComment(remainingComments);
-//     res.status(200).send("Comment has been exterminated");
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 export default commentsRouter;
