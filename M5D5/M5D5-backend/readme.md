@@ -1,5 +1,3 @@
-# M5_Strive.School
-
 ##Packages To Install For Project
 
 ####Step 1: create package.json

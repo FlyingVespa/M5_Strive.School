@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import listEndpoints from "express-list-endpoints";
-
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import authorsRouter from "./services/authors/index.js";
 import blogPostsRouter from "./services/blogPosts/index.js";
 import commentsRouter from "./services/comments/index.js";
@@ -11,13 +13,17 @@ import {
   catchAllErrorHandler,
 } from "./errorHandlers.js";
 
+dotenv.config();
+console.log(process.env.PORT);
+const { PORT } = process.env;
 const server = express();
-const PORT = 3222;
-// const publicFolderPath = join(
-//   getCurrentFolderPath(import.meta.url),
-//   "../public"
-// );
-// ************************** MIDDLEWARES **************************
+
+const publicFolderPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../public"
+);
+
+//******************* MIDDLEWARES **************************
 
 // const loggerMiddleware = (req, res, next) => {
 //   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
@@ -28,13 +34,13 @@ const loggerMiddleware2 = (req, res, next) => {
   console.log(`Request --> ${req.method} ${req.url} -- ${new Date()}`);
   next(); // mandatory to give the control to what is happening next
 };
-// server.use(express.static(publicFolderPath));
 server.use(cors());
 server.use(express.json());
+server.use(express.static(publicFolderPath));
 // server.use(loggerMiddleware); // GLOBAL MIDDLEWARE
 server.use("/author", authorsRouter);
 server.use("/blog", loggerMiddleware2, blogPostsRouter);
-server.use("/blog/comments", commentsRouter);
+server.use("/blog", commentsRouter);
 // *************************** ERROR MIDDLEWARES ***************************
 
 server.use(notFoundErrorHandler);
