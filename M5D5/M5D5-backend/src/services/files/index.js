@@ -11,10 +11,11 @@ filesRouter.post(
   "/upload",
   multer({
     fileFilter: (req, file, multerNext) => {
-      if (file.mimetype !== "image/gif") {
-        return multerNext(createError(400, "Only GIF allowed!"));
-      } else {
+      if (file.mimetype == "image/gif" || "image/png" || "image/jpg") {
+
         return multerNext(null, true);
+      } else {
+        return multerNext(createError(400, "Only GIF, jpg or png allowed!"));
       }
     },
   }).single("avatar"),

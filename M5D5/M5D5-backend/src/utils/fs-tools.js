@@ -10,9 +10,12 @@ console.log(process.env.PORT);
 const { PORT } = process.env;
 const { readJSON, writeJSON } = fs;
 
-// File Paths
+// FILE PATHS
 export const getDataFilePath = (fileName) =>
   join(dirname(fileURLToPath(import.meta.url)), "../jsondata/", fileName);
+
+export const getPublicFilePath = (filename) =>
+  join(dirname(fileURLToPath(import.meta.url)), "../public/", filename);
 
 //  JSON PARSED ARRAYS
 export const readFile = async (fileName) => {
@@ -21,7 +24,7 @@ export const readFile = async (fileName) => {
   return jsonfile;
 };
 
-// Write to files
+// WRITE TO FILES
 export const writeToFile = async (filename, content) => {
   await fs.writeFileSync(getDataFilePath(filename), JSON.stringify(content));
 };
