@@ -1,0 +1,37 @@
+{
+  "name": "M5-Benchmark-Neftlix-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx kill-port 3434 && nodemon -r dotenv/config -e js src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlyingVespa/M5-Benchmark-Neftlix-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlyingVespa/M5-Benchmark-Neftlix-backend/issues"
+  },
+  "homepage": "https://github.com/FlyingVespa/M5-Benchmark-Neftlix-backend#readme",
+  "dependencies": {
+    "cloudinary": "^1.26.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-list-endpoints": "^5.0.0",
+    "express-validator": "^6.12.0",
+    "fs-extra": "^10.0.0",
+    "http-errors": "^1.8.0",
+    "multer": "^1.4.2",
+    "uniqid": "^5.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.9"
+  }
+}
