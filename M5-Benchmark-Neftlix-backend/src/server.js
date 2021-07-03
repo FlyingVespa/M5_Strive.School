@@ -17,7 +17,7 @@ console.log(process.env.PORT);
 const { PORT } = process.env;
 const server = express();
 
-// *************************** MIDDLEWARES  ********************************
+// *************************** MIDDLEWARES  **********************n**********
 
 server.use(cors());
 server.use(express.json());
