@@ -9,12 +9,13 @@ M5D5/M5D5-frontend/node_modules
 M5D5/M5D5-frontend/.env
 M5D5/M5D5-backend/node_modules
 M5D5/M5D5-backend/.env
-M5-Benchmark-Netflix-frontend/node_modules
-M5-Benchmark-Netflix-frontend/.env
-M5-Benchmark-Netflix-backend/node_modules
-M5-Benchmark-Netflix-backend/.env
 M5D6/node_modules
 M5D7/node_modules
 M5D8/node_modules
 M5D9/node_modules
 M5D10/node_modules
+M5-Benchmark-Netflix-frontend/node_modules
+M5-Benchmark-Netflix-frontend/.env
+M5-Benchmark-Netflix-backend/node_modules
+M5-Benchmark-Netflix-backend/.env
+/
