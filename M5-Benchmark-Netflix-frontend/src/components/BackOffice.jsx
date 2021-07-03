@@ -3,6 +3,10 @@ import { Form, Button } from "react-bootstrap";
 
 export default class BackOffice extends Component {
   state = {
+    Title: "",
+    Year: "",
+    Type: "",
+    Poster: null,
     comment: {},
   };
   componentDidMount = async () => {
@@ -27,12 +31,20 @@ export default class BackOffice extends Component {
     } catch (err) {
       console.error(err);
     }
+
+    const inputChange = (e) => {
+      let id = e.target.id;
+      this.setState({
+        user: { ...this.state.user, [id]: e.target.value },
+      });
+    };
   };
 
   render() {
     return (
       <div>
-        <Form>
+        <Button onclick="">BACK OFFICE</Button>
+        {/* <Form>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
             <Form.Control type="email" placeholder="Enter email" />
@@ -51,7 +63,7 @@ export default class BackOffice extends Component {
           <Button variant="primary" type="submit">
             Submit
           </Button>
-        </Form>
+        </Form> */}
       </div>
     );
   }

@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import SingleMovie from "./SingleMovie";
-
 import { Carousel, Row, Image, Col, Container } from "react-bootstrap";
-
+require("dotenv").config();
 export default class RowOfMovies extends Component {
   state = {
     movies: [],
@@ -13,7 +12,8 @@ export default class RowOfMovies extends Component {
   //   }
 
   componentDidMount = async () => {
-    const altEndpoint = `http://www.omdbapi.com/?apikey=b35b3d1f&s=${this.props.title}`;
+    const APIKEY = process.env.REACT_APP_API_KEY;
+    const altEndpoint = `http://www.omdbapi.com/?apikey=${APIKEY}&s=${this.props.title}`;
 
     try {
       let resp = await fetch(altEndpoint, {
