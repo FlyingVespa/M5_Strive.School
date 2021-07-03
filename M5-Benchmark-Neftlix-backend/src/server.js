@@ -19,8 +19,8 @@ const server = express();
 
 // *************************** MIDDLEWARES  ********************************
 
-// server.use(cors());
-// server.use(express.join);
+server.use(cors());
+server.use(express.json());
 // server.use(express.static(publicFolderPath, "img")
 
 // *************************** ROUTE PATHS *********************************
