@@ -34,7 +34,7 @@ export const readFile = async (fileName) => {
 
 // MY METHOD:
 export const writeFile = async (fileName, content) => {
-  await fs.writeJSON(getDataFilePath(fileName), JSON.stringify(content));
+  await fs.writeJSON(getDataFilePath(fileName), content);
 };
 // const file = await files.find((file) => file._id === req.params.fileID);
 export const findById = async (fileName, id) => {

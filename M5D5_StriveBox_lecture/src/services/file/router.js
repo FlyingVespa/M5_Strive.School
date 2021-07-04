@@ -27,7 +27,6 @@ fileRouter.get("/:fileID", async (req, res, next) => {
   try {
     const file = await findById("files.json", req.params.fileID);
     res.status(200).send(file);
-    np;
   } catch (error) {
     next(error);
   }
@@ -41,15 +40,15 @@ fileRouter.post("/", async (req, res, next) => {
       const { text } = req.body;
       const newFile = {
         _id: uniqueId(),
-        text,
-
+        text: text,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
       const files = await readFile("files.json");
+      console.log(files);
       files.push(newFile);
-      await writeFile("files.json", authors);
-      res.status(201).send({ _id: newAuthor._id });
+      await writeFile("files.json", files);
+      res.send(newFile);
     } else {
       createError(400, "yes");
     }
@@ -59,7 +58,7 @@ fileRouter.post("/", async (req, res, next) => {
 });
 
 //🟥 UPDATE
-fileRouter.put("/:fileId", async (req, res, next) => {
+fileRouter.put("/:fileID", async (req, res, next) => {
   try {
     const file = await findById("files.json");
     if (file) {
@@ -77,13 +76,16 @@ fileRouter.put("/:fileId", async (req, res, next) => {
   }
 });
 // 🟥 DELETE
-fileRouter.delete("/:fileId", async (req, res, next) => {
+fileRouter.delete("/:fileID", async (req, res, next) => {
   try {
     const files = await readFile("files.json");
+
     const remainingfiles = await files.filter(
-      (author) => author._id !== req.params.authorId
+      (file) => file._id !== req.params.fileID
     );
+    console.log(remainingfiles);
     await writeFile("files.json", remainingfiles);
+    res.send("succes");
   } catch (error) {
     next(error);
   }
