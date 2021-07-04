@@ -13,7 +13,7 @@ npm i libarary_name
 
 Libraries:
 **express** ----> _initiates server_
-**express-list** ----> _helps view router lists_
+**express-list-endpoints** ----> _helps view router lists_
 **nodemon** ----> _creates almost like live-server, when saving auto prevent restart project to see implemented changes._
 **dotenv** ----> _creates environment to store "secret" stuff , such as api keys, port numbers etc to not be uploaded on github_
 **http-errors** ----> _creates custom error messages_
@@ -21,9 +21,11 @@ Libraries:
 **cors** ----> does something
 **uniqid** ----> creates unique id's
 **cloudaniry** ----> free cloud storage
+**express-validator**
+**fs-extra**
 
 ```
-npm i express express-list dotenv http-errors cors cloudinary multer uniqid
+npm i express express-list-endpoints dotenv http-errors cors cloudinary multer uniqid express-validator fs-extra
 ```
 
 save node mone in dev mode with -D (when publishing it won't be in package)
