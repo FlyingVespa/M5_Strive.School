@@ -95,10 +95,16 @@ fileRouter.put("/:fileID", async (req, res, next) => {
 fileRouter.delete("/:fileID", async (req, res, next) => {
   try {
     const files = await readFile("files.json");
-
     const remainingfiles = await files.filter(
       (file) => file._id !== req.params.fileID
     );
+
+    delete req.file.buffer;
+    const file = {
+      name: originalname,
+      url: viewURL,
+    };
+
     console.log(remainingfiles);
     await writeFile("files.json", remainingfiles);
     res.send("deleted");
