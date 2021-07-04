@@ -1,12 +1,16 @@
 import express, { Router } from "express";
 import uniqueId from "uniqid";
 import createError from "http-errors";
+import fileValidation from "./validation.js";
+import { validationResult } from "express-validator";
 import {
   readFile,
   uploadFile,
   writeFile,
   findById,
+  deleteById,
 } from "../../utils/fs-tools.js";
+import { write } from "fs-extra";
 const fileRouter = express();
 
 //🟩 GET ALL
@@ -32,17 +36,28 @@ fileRouter.get("/:fileID", async (req, res, next) => {
 // 🟩 POST
 fileRouter.post("/", async (req, res, next) => {
   try {
-    // const { text } = req.body;
-    // const newFile = {
-    //   text,
-    // };
-    const files = await writeFile("files.json", req.body);
-    res.send(files);
-    // res.status(201).send({ _id: newFile._id });
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+      const { text } = req.body;
+      const newFile = {
+        _id: uniqueId(),
+        text,
+
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const files = await readFile("files.json");
+      files.push(newFile);
+      await writeFile("files.json", authors);
+      res.status(201).send({ _id: newAuthor._id });
+    } else {
+      createError(400, "yes");
+    }
   } catch (error) {
     next(error);
   }
 });
+
 //🟥 UPDATE
 fileRouter.put("/:fileId", async (req, res, next) => {
   try {
@@ -55,7 +70,7 @@ fileRouter.put("/:fileId", async (req, res, next) => {
       file = newfile;
       res.status(200).send({ _id: newFile._id });
     } else {
-      next(createError(400, { erroList: errors }));
+      next(createError(400, "error"));
     }
   } catch (error) {
     next(error);
@@ -64,8 +79,11 @@ fileRouter.put("/:fileId", async (req, res, next) => {
 // 🟥 DELETE
 fileRouter.delete("/:fileId", async (req, res, next) => {
   try {
-    const deleted = await deleteById("files.json", req.params.fileId);
-    res.status(200).send(deleted);
+    const files = await readFile("files.json");
+    const remainingfiles = await files.filter(
+      (author) => author._id !== req.params.authorId
+    );
+    await writeFile("files.json", remainingfiles);
   } catch (error) {
     next(error);
   }

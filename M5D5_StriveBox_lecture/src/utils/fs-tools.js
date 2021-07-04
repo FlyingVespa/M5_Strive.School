@@ -34,17 +34,7 @@ export const readFile = async (fileName) => {
 
 // MY METHOD:
 export const writeFile = async (fileName, content) => {
-  const filePath = await getDataFilePath(fileName);
-  const json = await readFile(fileName);
-  console.log(json);
-  json.push({
-    _id: uniqueId(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...content,
-  });
-  await fs.writeJSON(filePath, json);
-  return json;
+  await fs.writeJSON(getDataFilePath(fileName), JSON.stringify(content));
 };
 // const file = await files.find((file) => file._id === req.params.fileID);
 export const findById = async (fileName, id) => {
@@ -57,37 +47,19 @@ export const findById = async (fileName, id) => {
   }
 };
 
-// export const findById = async (fileName, id) => {
-//   const json = await readFile(fileName);
-//   const foundObj = json.filter((obj) => obj.id === id);
-//   if (foundObj) {
-//     return foundObj;
-//   } else {
-//     createHttpError(404, "Object cannot be found");
-//   }
-// };
-// export const writeToFile = async (filename, content) => {
-//   const json = await fs.writeFileSync(
-//     getDataFilePath(filename),
-//     JSON.stringify(content)
-//   );
-//   json.push({
-//     _id,
-//     ...content,
-//   });
-// };
-
-// export const deleteById = async (fileName, id) => {
-//   const jsonFile = getDataFilePath(fileName);
-//   let files = await readFile(fileName);
-//   const file = await files.filter((file) => file._id === id);
-//   if (file) {
-//     files = files.find((obj) => obj.id !== id);
-//     await fs.writeJSON(jsonFile, files);
-//   } else {
-//     createHttpError(400, "something went wrong");
-//   }
-// };
+export const deleteById = async (name, id) => {
+  const filesJSONPath = await getDataFilePath(name);
+  let json = await readFile(name);
+  const foundObject = await json.find((obj) => obj.id === id);
+  if (foundObject) {
+    json = json.filter((obj) => obj.id !== id);
+    await fs.writeJSON(filesJSONPath, json);
+    return foundObject;
+  } else {
+    const error = createHttpError(404, "This object not found");
+    throw error;
+  }
+};
 
 export const convertFile = multer();
 
