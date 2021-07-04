@@ -1,5 +1,6 @@
 import express from "express";
 import fileRouter from "./services/file/router.js";
+import listEndpoints from "express-list-endpoints";
 import {
   notFoundErrorHandler,
   badRequestErrorHandler,
@@ -8,9 +9,16 @@ import {
 
 const { PORT } = process.env;
 const server = express();
+server.use(express.json());
 
-server.use("");
+server.get("/", (req, res, next) => {
+  res.setHeader("Content-Type", "text/html");
+  res.send("<h1>WORKING HARD</h1>");
+});
 
+server.use("/files", fileRouter);
+
+console.table(listEndpoints(server));
 server.listen(PORT, () =>
   console.log(`✅ A portal has opened on ${PORT} , enter if you dare`)
 );
