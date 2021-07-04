@@ -5,6 +5,7 @@ import { dirname, join, extname } from "path";
 import multer from "multer";
 import dotenv from "dotenv";
 import createHttpError from "http-errors";
+import { stringify } from "querystring";
 
 // *********************************** ENV CONFIG *******************************************
 dotenv.config();
@@ -24,7 +25,7 @@ export const getDataFilePath = (fileName) => {
 // *********************************** READING JSON FILES ***********************************
 // MY METHOD:
 export const readFile = async (fileName) => {
-  const test = getDataFilePath(fileName);
+  const test = await getDataFilePath(fileName);
   const jsonfile = await fs.readJSON(test);
   return jsonfile;
 };
@@ -33,11 +34,11 @@ export const readFile = async (fileName) => {
 
 // MY METHOD:
 export const writeFile = async (fileName, content) => {
-  //   const filePath = await getDataFilePath(fileName);
+  const filePath = await getDataFilePath(fileName);
   const json = await readFile(fileName);
+  console.log(json);
   json.push({
     _id: uniqueId(),
-
     createdAt: new Date(),
     updatedAt: new Date(),
     ...content,

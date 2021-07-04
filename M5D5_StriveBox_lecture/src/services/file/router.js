@@ -23,6 +23,7 @@ fileRouter.get("/:fileID", async (req, res, next) => {
   try {
     const file = await findById("files.json", req.params.fileID);
     res.status(200).send(file);
+    np;
   } catch (error) {
     next(error);
   }
