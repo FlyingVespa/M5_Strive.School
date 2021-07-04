@@ -1,18 +1,19 @@
 import express, { Router } from "express";
 import uniqueId from "uniqid";
-import createError from "http-errors";
+import multer from "multer";
+import fs from "fs-extra";
 import fileValidation from "./validation.js";
 import { validationResult } from "express-validator";
 import {
   readFile,
-  uploadFile,
   writeFile,
   findById,
-  deleteById,
+  getDataFilePath,
 } from "../../utils/fs-tools.js";
 import { write } from "fs-extra";
+import createHttpError from "http-errors";
 const fileRouter = express();
-
+const upload = multer();
 //🟩 GET ALL
 fileRouter.get("/", async (req, res, next) => {
   try {
@@ -33,45 +34,51 @@ fileRouter.get("/:fileID", async (req, res, next) => {
 });
 
 // 🟩 POST
-fileRouter.post("/", async (req, res, next) => {
+fileRouter.post("/", upload.single("cover"), async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) {
-      const { text } = req.body;
-      const newFile = {
-        _id: uniqueId(),
-        text: text,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      const files = await readFile("files.json");
-      console.log(files);
-      files.push(newFile);
-      await writeFile("files.json", files);
-      res.send(newFile);
-    } else {
-      createError(400, "yes");
-    }
+    console.log(req.body);
+    // const errors = validationResult(req);
+    // if (errors.isEmpty()) {
+    //   const { text } = req.body;
+    //   const newFile = {
+    //     _id: uniqueId(),
+    //     text: text,
+    //     createdAt: new Date(),
+    //     updatedAt: new Date(),
+    //   };
+    //   const files = await readFile("files.json");
+    //   console.log(files);
+    //   files.push(newFile);
+    //   await writeFile("files.json", files);
+    //   res.send(newFile);
+    // } else {
+    //   next(createHttpError(400, "{ erroList: errors }"));
+    // }
+    const { originalname, buffer } = req.file;
+    const filePath = getDataFilePath(originalname);
+    await fs.writeFile(filePath, buffer);
+    console.log(req.file);
+    res.send("files");
   } catch (error) {
     next(error);
   }
 });
 
-//🟥 UPDATE
+//🟩 UPDATE
 fileRouter.put("/:fileID", async (req, res, next) => {
   try {
     const files = await readFile("files.json");
     const remainingfiles = files.filter(
       (file) => file._id !== req.params.fileID
     );
-    // console.log(remainingfiles);
-
-    const updatedFile = { ...req.body, _id: req.params.fileID };
-    console.log(updatedFile);
-    await remainingfiles.push(updatedFile);
-    await writeFile("files.json", remainingfiles);
-    res.send(remainingfiles);
-    // console.log(remainingfiles);
+    if (remainingfiles) {
+      const updatedFile = { ...req.body, _id: req.params.fileID };
+      await remainingfiles.push(updatedFile);
+      await writeFile("files.json", remainingfiles);
+      res.send(updatedFile);
+    } else {
+      next(createHttpError(400, "Something wrong"));
+    }
   } catch (error) {
     next(error);
   }
@@ -86,7 +93,7 @@ fileRouter.delete("/:fileID", async (req, res, next) => {
     );
     console.log(remainingfiles);
     await writeFile("files.json", remainingfiles);
-    res.send("succes");
+    res.send("deleted");
   } catch (error) {
     next(error);
   }

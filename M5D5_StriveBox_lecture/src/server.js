@@ -11,11 +11,6 @@ const { PORT } = process.env;
 const server = express();
 server.use(express.json());
 
-server.get("/", (req, res, next) => {
-  res.setHeader("Content-Type", "text/html");
-  res.send("<h1>WORKING HARD</h1>");
-});
-
 server.use("/files", fileRouter);
 
 server.listen(PORT, () =>
