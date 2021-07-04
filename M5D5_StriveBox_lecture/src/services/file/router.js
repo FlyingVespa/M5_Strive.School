@@ -22,7 +22,7 @@ fileRouter.get("/", async (req, res, next) => {
     next(error);
   }
 });
-// 🟩 GET SINGLE not working
+// 🟩 GET SINGLE
 fileRouter.get("/:fileID", async (req, res, next) => {
   try {
     const file = await findById("files.json", req.params.fileID);
@@ -60,22 +60,23 @@ fileRouter.post("/", async (req, res, next) => {
 //🟥 UPDATE
 fileRouter.put("/:fileID", async (req, res, next) => {
   try {
-    const file = await findById("files.json");
-    if (file) {
-      const newfile = {
-        _id: req.params.fileID,
-        text,
-      };
-      file = newfile;
-      res.status(200).send({ _id: newFile._id });
-    } else {
-      next(createError(400, "error"));
-    }
+    const files = await readFile("files.json");
+    const remainingfiles = files.filter(
+      (file) => file._id !== req.params.fileID
+    );
+    // console.log(remainingfiles);
+
+    const updatedFile = { ...req.body, _id: req.params.fileID };
+    console.log(updatedFile);
+    await remainingfiles.push(updatedFile);
+    await writeFile("files.json", remainingfiles);
+    res.send(remainingfiles);
+    // console.log(remainingfiles);
   } catch (error) {
     next(error);
   }
 });
-// 🟥 DELETE
+// 🟩 DELETE
 fileRouter.delete("/:fileID", async (req, res, next) => {
   try {
     const files = await readFile("files.json");
