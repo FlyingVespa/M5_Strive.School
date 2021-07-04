@@ -22,6 +22,19 @@ export const getDataFilePath = (fileName) => {
   );
 };
 
+export const getPubDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../public/img"
+);
+
+export const getImgFilePath = (fileName) => {
+  return join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../public/img",
+    fileName
+  );
+};
+
 // *********************************** READING JSON FILES ***********************************
 // MY METHOD:
 export const readFile = async (fileName) => {

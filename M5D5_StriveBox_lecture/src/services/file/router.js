@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import uniqueId from "uniqid";
 import multer from "multer";
 import fs from "fs-extra";
+import { join } from "path";
 import fileValidation from "./validation.js";
 import { validationResult } from "express-validator";
 import {
@@ -9,9 +10,14 @@ import {
   writeFile,
   findById,
   getDataFilePath,
+  getImgFilePath,
+  getPubDir,
 } from "../../utils/fs-tools.js";
 import { write } from "fs-extra";
 import createHttpError from "http-errors";
+
+const { PORT } = process.env;
+const isDeployed = process.env.NODE_ENV === "production";
 const fileRouter = express();
 const upload = multer();
 //🟩 GET ALL
@@ -55,10 +61,12 @@ fileRouter.post("/", upload.single("cover"), async (req, res, next) => {
     //   next(createHttpError(400, "{ erroList: errors }"));
     // }
     const { originalname, buffer } = req.file;
-    const filePath = getDataFilePath(originalname);
-    await fs.writeFile(filePath, buffer);
+    await fs.writeFile(join(getPubDir, originalname), buffer);
+    const viewURL = `${req.protocol}://${req.hostname}:${
+      isDeployed ? "" : PORT
+    }/${originalname}`;
     console.log(req.file);
-    res.send("files");
+    res.send(viewURL);
   } catch (error) {
     next(error);
   }
